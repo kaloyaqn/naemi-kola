@@ -1,6 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -61,4 +64,24 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+body {
+  font-family: "Inter";
+  background: #F6F7F9;
+}
+
+.ad-1 {
+  background-image: url("../public/images/ads/background-1.png");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: cover;
+}
+
+.ad-2 {
+  background-image: url("../public/images/ads/background-2.png");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: cover;
 }
