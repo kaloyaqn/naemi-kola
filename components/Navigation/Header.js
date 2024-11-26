@@ -16,54 +16,54 @@ import Link from "next/link";
 export default function Header() {
 const navigationItems = [
     {
-    title: "Начало",
+    title: "",
     href: "/",
     description: "",
     },
-    {
-    title: "Продукт",
-    description: "Managing a small business today is already tough.",
-    items: [
-        {
-        title: "Reports",
-        href: "/reports",
-        },
-        {
-        title: "Statistics",
-        href: "/statistics",
-        },
-        {
-        title: "Dashboards",
-        href: "/dashboards",
-        },
-        {
-        title: "Recordings",
-        href: "/recordings",
-        },
-    ],
-    },
-    {
-    title: "Компания",
-    description: "Managing a small business today is already tough.",
-    items: [
-        {
-        title: "About us",
-        href: "/about",
-        },
-        {
-        title: "Fundraising",
-        href: "/fundraising",
-        },
-        {
-        title: "Investors",
-        href: "/investors",
-        },
-        {
-        title: "Contact us",
-        href: "/contact",
-        },
-    ],
-    },
+    // {
+    // title: "Продукт",
+    // description: "Managing a small business today is already tough.",
+    // items: [
+    //     {
+    //     title: "Reports",
+    //     href: "/reports",
+    //     },
+    //     {
+    //     title: "Statistics",
+    //     href: "/statistics",
+    //     },
+    //     {
+    //     title: "Dashboards",
+    //     href: "/dashboards",
+    //     },
+    //     {
+    //     title: "Recordings",
+    //     href: "/recordings",
+    //     },
+    // ],
+    // },
+    // {
+    // title: "Компания",
+    // description: "Managing a small business today is already tough.",
+    // items: [
+    //     {
+    //     title: "About us",
+    //     href: "/about",
+    //     },
+    //     {
+    //     title: "Fundraising",
+    //     href: "/fundraising",
+    //     },
+    //     {
+    //     title: "Investors",
+    //     href: "/investors",
+    //     },
+    //     {
+    //     title: "Contact us",
+    //     href: "/contact",
+    //     },
+    // ],
+    // },
 ];
 
 const [isOpen, setOpen] = useState(false);
@@ -73,6 +73,9 @@ return (
         <div className="justify-start items-center gap-4 lg:flex hidden flex-row">
         <NavigationMenu className="flex justify-start items-start">
             <NavigationMenuList className="flex justify-start gap-4 flex-row">
+                <Link href={"/"}>Начало</Link>
+                <Link href={"/admin/orders"}>Админ</Link>
+
             {navigationItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
                 {item.href ? (
@@ -121,15 +124,12 @@ return (
         </NavigationMenu>
         </div>
         <div className="flex lg:justify-center">
+        <Link href="/">
         <p className="font-semibold">Naemi-kola</p>
+        </Link>
         </div>
         <div className="flex justify-end w-full gap-4">
-        <Button variant="ghost" className="hidden md:inline">
-            Свържи се с нас
-        </Button>
-        <div className="border-r hidden md:inline"></div>
-        <Button variant="outline">Влез</Button>
-        <Button>Регистрирай се</Button>
+        <div className="border-r hidden md:inline"></div>       
         </div>
         <div className="flex w-12 shrink lg:hidden items-end justify-end">
         <Button variant="ghost" onClick={() => setOpen(!isOpen)}>

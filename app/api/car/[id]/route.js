@@ -17,7 +17,9 @@ export async function GET(req, { params }) {
           brand_id,
           brands (name),
           models (name),
-          seats
+          seats,
+          transmission_type,
+          type_car
         `)
         .eq('id', id);  // Add the where clause to filter by car id
   

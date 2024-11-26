@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 
 export default function ProductCard({ cars }) {
+  const [setImage, image] = useState(null)
   useEffect(() => {
     console.log(cars);
+
   }, []);
 
   return (
@@ -55,7 +57,7 @@ export default function ProductCard({ cars }) {
       <div className="flex-grow flex items-center justify-center my-4">
         <div className="w-64 h-40 flex items-center justify-center overflow-hidden">
           <img
-            src={cars.image_url}
+            src={cars.image_url[0]}
             className="w-full h-full object-contain"
             alt={cars.brands.name + " " + cars.models.name}
           />
@@ -99,7 +101,7 @@ export default function ProductCard({ cars }) {
             <rect x="17" y="11" width="4" height="2" fill="#90A3BF" />
             <rect x="3" y="11" width="4" height="2" fill="#90A3BF" />
           </svg>
-          Ръчка
+          {cars.transmission_type}
         </div>
         <div className="flex gap-[6px] items-center text-sm font-medium text-[#90A3BF]">
           <svg

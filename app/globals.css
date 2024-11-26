@@ -85,3 +85,37 @@ body {
   background-position: bottom;
   background-size: cover;
 }
+
+.slide {
+  display: flex;
+  justify-content: center;
+}
+
+.thumb {
+  width: 148px !important;
+  height: 124px !important;
+}
+
+.thumb img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.thumbs {
+  display: flex !important;
+}
+
+.thumb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.thumb .selected {
+  border: 1px solid blue
+}
+
+.thumb img {
+  margin: 0 auto;
+}
