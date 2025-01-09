@@ -1,6 +1,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Navigation/Header";
+import { createClient } from '../utils/supabase/client'
+
 
 export const metadata = {
   title: "Create Next App",
@@ -8,10 +10,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const supabase = createClient()
+
   return (
     <html lang="en">
       <head>
-<link href="https://fonts.googleapis.com/css?family=Inter:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Inter:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic" rel="stylesheet" />
       </head>
       <body>
         <Header />

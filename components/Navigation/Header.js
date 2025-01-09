@@ -1,176 +1,159 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-NavigationMenu,
-NavigationMenuContent,
-NavigationMenuItem,
-NavigationMenuLink,
-NavigationMenuList,
-NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Menu, MoveRight, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import Login from "../Login";
+
 
 export default function Header() {
-const navigationItems = [
-    {
-    title: "",
-    href: "/",
-    description: "",
-    },
-    // {
-    // title: "Продукт",
-    // description: "Managing a small business today is already tough.",
-    // items: [
-    //     {
-    //     title: "Reports",
-    //     href: "/reports",
-    //     },
-    //     {
-    //     title: "Statistics",
-    //     href: "/statistics",
-    //     },
-    //     {
-    //     title: "Dashboards",
-    //     href: "/dashboards",
-    //     },
-    //     {
-    //     title: "Recordings",
-    //     href: "/recordings",
-    //     },
-    // ],
-    // },
-    // {
-    // title: "Компания",
-    // description: "Managing a small business today is already tough.",
-    // items: [
-    //     {
-    //     title: "About us",
-    //     href: "/about",
-    //     },
-    //     {
-    //     title: "Fundraising",
-    //     href: "/fundraising",
-    //     },
-    //     {
-    //     title: "Investors",
-    //     href: "/investors",
-    //     },
-    //     {
-    //     title: "Contact us",
-    //     href: "/contact",
-    //     },
-    // ],
-    // },
-];
+  const [isOpen, setIsOpen] = useState(false);
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const supabase = createClient();
 
-const [isOpen, setOpen] = useState(false);
-return (
-    <header className="w-full z-40  top-0 left-0 bg-white border-b border-[#E8EEF5] ">
-    <div className="container relative mx-auto min-h-20 flex gap-4 flex-row lg:grid lg:grid-cols-3 items-center">
+  const navigationItems = [
+    { title: "Начало", href: "/" },
+  ];
+
+  useEffect(() => {
+    async function fetchSessionAndProfile() {
+      // Fetch session
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+
+      // Fetch profile if session exists
+      if (session) {
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileData) {
+          setProfile(profileData);
+        }
+      }
+    }
+
+    fetchSessionAndProfile();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+      }
+    );
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  }
+
+  // Conditionally add admin navigation item
+  const fullNavigationItems = [
+    ...navigationItems,
+    ...(profile?.role === 'admin' ? [{ title: "Админ", href: "/admin" }] : [])
+  ];
+
+  return (
+    <header className="w-full z-40 top-0 left-0 bg-white border-b border-[#E8EEF5]">
+      <div className="container relative mx-auto min-h-20 flex gap-4 flex-row lg:grid lg:grid-cols-3 items-center">
+        {/* Desktop Navigation */}
         <div className="justify-start items-center gap-4 lg:flex hidden flex-row">
-        <NavigationMenu className="flex justify-start items-start">
-            <NavigationMenuList className="flex justify-start gap-4 flex-row">
-                <Link href={"/"}>Начало</Link>
-                <Link href={"/admin/orders"}>Админ</Link>
+          <div className="flex justify-start gap-4 flex-row">
+            {fullNavigationItems.map((item) => (
+              <div key={item.title}>
+                <Link href={item.href}>
+                  <Button variant="ghost">{item.title}</Button>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
 
-            {navigationItems.map((item) => (
-                <NavigationMenuItem key={item.title}>
-                {item.href ? (
-                    <>
-                    <NavigationMenuLink>
-                        <Button variant="ghost">{item.title}</Button>
-                    </NavigationMenuLink>
-                    </>
-                ) : (
-                    <>
-                    <NavigationMenuTrigger className="font-medium text-sm">
-                        {item.title}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="!w-[450px] p-4">
-                        <div className="flex flex-col lg:grid grid-cols-2 gap-4">
-                        <div className="flex flex-col h-full justify-between">
-                            <div className="flex flex-col">
-                            <p className="text-base">{item.title}</p>
-                            <p className="text-muted-foreground text-sm">
-                                {item.description}
-                            </p>
-                            </div>
-                            <Button size="sm" className="mt-10">
-                            Book a call today
-                            </Button>
-                        </div>
-                        <div className="flex flex-col text-sm h-full justify-end">
-                            {item.items?.map((subItem) => (
-                            <NavigationMenuLink
-                                href={subItem.href}
-                                key={subItem.title}
-                                className="flex flex-row justify-between items-center hover:bg-muted py-2 px-4 rounded"
-                            >
-                                <span>{subItem.title}</span>
-                                <MoveRight className="w-4 h-4 text-muted-foreground" />
-                            </NavigationMenuLink>
-                            ))}
-                        </div>
-                        </div>
-                    </NavigationMenuContent>
-                    </>
-                )}
-                </NavigationMenuItem>
-            ))}
-            </NavigationMenuList>
-        </NavigationMenu>
-        </div>
+        {/* Logo */}
         <div className="flex lg:justify-center">
-        <Link href="/">
-        <p className="font-semibold">Naemi-kola</p>
-        </Link>
+          <Link href="/">
+            <p className="font-semibold">Naemi-kola</p>
+          </Link>
         </div>
+
+        {/* User Actions */}
         <div className="flex justify-end w-full gap-4">
-        <div className="border-r hidden md:inline"></div>       
+          <div className="border-r hidden md:inline"></div>
+          <div className="flex items-center gap-4">
+            {session ? (
+              <div className="flex items-center gap-2">
+                <Link href="/account">
+                  <Button variant="ghost">Профил</Button>
+                </Link>
+                <Button variant="secondary" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <div onClick={() => setIsOpen(true)}>
+                <Button variant="primary">Вход</Button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Mobile Menu */}
         <div className="flex w-12 shrink lg:hidden items-end justify-end">
-        <Button variant="ghost" onClick={() => setOpen(!isOpen)}>
+          <Button variant="ghost" onClick={() => setOpen(!isOpen)}>
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </Button>
-        {isOpen && (
+          </Button>
+          {isOpen && (
             <div className="absolute top-20 border-t flex flex-col w-full right-0 bg-background shadow-lg py-4 container gap-8">
-            {navigationItems.map((item) => (
+              {fullNavigationItems.map((item) => (
                 <div key={item.title}>
-                <div className="flex flex-col gap-2">
-                    {item.href ? (
-                    <Link
-                        href={item.href}
-                        className="flex justify-between items-center"
-                    >
-                        <span className="text-lg">{item.title}</span>
-                        <MoveRight className="w-4 h-4 stroke-1 text-muted-foreground" />
+                  <div className="flex flex-col gap-2">
+                    <Link href={item.href} className="text-lg">
+                      {item.title}
                     </Link>
-                    ) : (
-                    <p className="text-lg">{item.title}</p>
-                    )}
-                    {item.items &&
-                    item.items.map((subItem) => (
-                        <Link
-                        key={subItem.title}
-                        href={subItem.href}
-                        className="flex justify-between items-center"
-                        >
-                        <span className="text-muted-foreground">
-                            {subItem.title}
-                        </span>
-                        <MoveRight className="w-4 h-4 stroke-1" />
-                        </Link>
-                    ))}
+                  </div>
                 </div>
+              ))}
+              {session ? (
+                <div className="flex flex-col gap-2">
+                  <Link href="/account" className="text-lg">
+                    Профил
+                  </Link>
+                  <Button 
+                    variant="secondary" 
+                    onClick={handleLogout}
+                    className="self-start"
+                  >
+                    Logout
+                  </Button>
                 </div>
-            ))}
+              ) : (
+                <button onClick={() => setIsOpen(true)} className="text-lg">
+                  Вход
+                </button>
+                
+              )}
             </div>
-        )}
+          )}
         </div>
-    </div>
+      </div>
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+  <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+    <DialogPanel className="max-w-lg space-y-4 border bg-white p-12">
+      <Login open={isOpen} setIsOpen={setIsOpen}/>
+    </DialogPanel>
+  </div>
+</Dialog>
     </header>
-);
-};
+  );
+}
